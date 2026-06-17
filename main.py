@@ -1,3 +1,4 @@
+import argparse
 from detector import detect_log_format
 
 def read_log_file(path):
@@ -27,5 +28,13 @@ def read_log_file(path):
     except FileNotFoundError:
         print("File was not found")
 
-for line in read_log_file("/home/dm/log-analyzer/main.py"):
-     print(line)
+def main():
+    parser = argparse.ArgumentParser(description="CLI de Análise de Logs")
+    parser.add_argument("--file", required=True, help="Caminho do ficheiro de log")
+    args = parser.parse_args()
+
+    for line in read_log_file(args.file):
+        print(line)
+
+if __name__ == "__main__":
+    main()
