@@ -32,10 +32,15 @@ def read_log_file(path):
 def main():
     parser = argparse.ArgumentParser(description="CLI de Análise de Logs")
     parser.add_argument("--file", required=True, help="Caminho do ficheiro de log")
+    parser.add_argument("--level", choices=["ERROR", "WARN", "INFO", "DEBUG"],help="Filtrar por nivel de severidade")
     args = parser.parse_args()
 
-    for line, log_format in read_log_file(args.file):
+    for line,log_format in read_log_file(args.file):
         entry = parse_line(line, log_format)
+        if entry is None:
+            continue
+        if args.level and entry["level"]!= args.level:
+            continue
         print(entry)
 
 if __name__ == "__main__":
