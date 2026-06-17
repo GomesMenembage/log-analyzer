@@ -21,3 +21,18 @@ def aggregate(entries):
         if hour:
             counts[hour][entry["level"]] += 1
     return counts
+
+
+def generate_summary(counts):
+    total = sum(sum(v.values()) for v in counts.values())
+    errors = sum(v.get("ERROR", 0) for v in counts.values())
+    warnings = sum(v.get("WARN", 0) for v in counts.values())
+
+    return {
+        "total": total,
+        "errors": errors,
+        "warnings": warnings,
+        "hours": {
+            hour: dict(levels) for hour, levels in sorted(counts.items())
+        },
+    }
