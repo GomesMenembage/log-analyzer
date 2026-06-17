@@ -1,7 +1,7 @@
 import argparse
 from detector import detect_log_format
 from parser import parse_line
-from aggregator import aggregate
+from aggregator import aggregate, generate_summary
 
 def read_log_file(path):
 
@@ -47,9 +47,16 @@ def main():
         print(entry)
 
     counts = aggregate(entries)
-    print("\n--- Agregação por hora ---")
-    for hour in sorted(counts):
-        print(f"{hour} -> {dict(counts[hour])}")
+    summary = generate_summary(counts)
+
+    print("\n=== RESUMO DA ANALISE ===")
+    print(f"Total de logs processados: {summary['total']}")
+    print(f"Total de ERROR: {summary['errors']}")
+    print(f"Total de WARN: {summary['warnings']}")
+    print("Frequencia por hora:")
+    for hour, levels in summary["hours"].items():
+        parts = ", ".join(f"{k}: {v}" for k, v in levels.items())
+        print(f"  {hour} - {parts}")
 
 if __name__ == "__main__":
     main()
