@@ -107,7 +107,3 @@ log-analyzer/
 ├── exporter.py          # Exportação CSV
 └── README.md
 ```
-
-## Licença
-
-MIT
