@@ -1,5 +1,6 @@
 import argparse
 from detector import detect_log_format
+from parser import extract_timestamp
 
 def read_log_file(path):
 
@@ -23,7 +24,7 @@ def read_log_file(path):
             for line in log_file:
                 valid_line = line.strip()
                 if valid_line:
-                    yield line
+                    yield valid_line, log_format
 
     except FileNotFoundError:
         print("File was not found")
@@ -33,8 +34,9 @@ def main():
     parser.add_argument("--file", required=True, help="Caminho do ficheiro de log")
     args = parser.parse_args()
 
-    for line in read_log_file(args.file):
-        print(line)
+    for line, log_format in read_log_file(args.file):
+        timestamp = extract_timestamp(line, log_format)
+        print(f"{line} -> {timestamp}")
 
 if __name__ == "__main__":
     main()
