@@ -1,6 +1,6 @@
 import argparse
 from detector import detect_log_format
-from parser import extract_timestamp
+from parser import parse_line
 
 def read_log_file(path):
 
@@ -35,8 +35,8 @@ def main():
     args = parser.parse_args()
 
     for line, log_format in read_log_file(args.file):
-        timestamp = extract_timestamp(line, log_format)
-        print(f"{line} -> {timestamp}")
+        entry = parse_line(line, log_format)
+        print(entry)
 
 if __name__ == "__main__":
     main()
