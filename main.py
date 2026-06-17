@@ -1,6 +1,7 @@
 import argparse
 from detector import detect_log_format
 from parser import parse_line
+from aggregator import aggregate
 
 def read_log_file(path):
 
@@ -35,13 +36,20 @@ def main():
     parser.add_argument("--level", choices=["ERROR", "WARN", "INFO", "DEBUG"],help="Filtrar por nivel de severidade")
     args = parser.parse_args()
 
+    entries = []
     for line,log_format in read_log_file(args.file):
         entry = parse_line(line, log_format)
         if entry is None:
             continue
         if args.level and entry["level"]!= args.level:
             continue
+        entries.append(entry)
         print(entry)
+
+    counts = aggregate(entries)
+    print("\n--- Agregação por hora ---")
+    for hour in sorted(counts):
+        print(f"{hour} -> {dict(counts[hour])}")
 
 if __name__ == "__main__":
     main()
