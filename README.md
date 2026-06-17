@@ -1,10 +1,10 @@
 # CLI de Análise de Logs
 
-Ferramenta de linha de comando para análise, filtragem e enriquecimento de ficheiros de log (Apache, Nginx ou logs personalizados). Processa logs linha por linha, identifica níveis de severidade, agrupa eventos por hora, consulta uma API pública de geolocalização de IP e exporta um resumo estatístico em CSV.
+Ferramenta de linha de comando para análise, filtragem e enriquecimento de ficheiros de log Apache e Nginx (access log e error log). Processa logs linha por linha, identifica níveis de severidade, agrupa eventos por hora, consulta uma API pública de geolocalização de IP e exporta um resumo estatístico em CSV.
 
 ## Funcionalidades
 
-- Leitura de logs nos formatos Apache, Nginx e logs personalizados (ex.: ESP32)
+- Leitura de logs nos formatos Apache e Nginx (access log e error log)
 - Filtragem por nível de severidade (`ERROR`, `WARN`, `INFO`, `DEBUG`)
 - Extração e agrupamento de eventos por hora
 - Deteção de endereços IP e enriquecimento com dados de geolocalização (país, cidade, ISP, região)
@@ -66,7 +66,7 @@ hora,tipo,total,pais,cidade
 ```
 log-analyzer/
 ├── main.py              # Ponto de entrada com argparse
-├── log_parser.py        # Leitura e parsing de logs
+├── log_parser.py        # Parsing de logs Apache e Nginx
 ├── geo_enricher.py      # Consulta à API de geolocalização
 ├── aggregator.py        # Agregação e estatísticas
 ├── exporter.py          # Exportação CSV
@@ -78,7 +78,7 @@ log-analyzer/
 
 | ID | Descrição |
 |----|-----------|
-| RF01 | Ler ficheiros de log em formatos compatíveis |
+| RF01 | Ler ficheiros de log nos formatos Apache e Nginx |
 | RF02 | Validar existência do ficheiro antes do processamento |
 | RF03 | Analisar cada linha do ficheiro para extrair informações |
 | RF04 | Reconhecer níveis de severidade (ERROR, WARN, INFO, DEBUG) |
@@ -88,7 +88,6 @@ log-analyzer/
 | RF08 | Contar ocorrências por nível de log |
 | RF09 | Detetar endereços IP nas entradas do log |
 | RF10 | Consultar API pública de geolocalização de IP |
-| RF11 | Adicionar dados de geolocalização aos logs processados |
 | RF12 | Gerar resumo estatístico (totais e frequência por hora) |
 | RF13 | Exportar relatório em formato CSV |
 | RF14 | Aceitar parâmetros via CLI com argparse |
