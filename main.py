@@ -3,6 +3,7 @@ from detector import detect_log_format
 from parser import parse_line
 from aggregator import aggregate, generate_summary
 from exporter import export_csv
+from geo_enricher import enrich_entries
 
 def read_log_file(path):
 
@@ -46,6 +47,9 @@ def main():
         if args.level and entry["level"]!= args.level:
             continue
         entries.append(entry)
+
+    entries = enrich_entries(entries)
+    for entry in entries:
         print(entry)
 
     counts = aggregate(entries)
@@ -60,7 +64,7 @@ def main():
         parts = ", ".join(f"{k}: {v}" for k, v in levels.items())
         print(f"  {hour} - {parts}")
 
-    export_csv(summary, args.output)
+    export_csv(entries, args.output)
     print(f"\nRelatorio exportado para: {args.output}")
 
 if __name__ == "__main__":
