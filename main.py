@@ -51,8 +51,8 @@ def main():
     counts = aggregate(entries)
     summary = generate_summary(counts)
 
-    print("\nRESUMO DA ANALISE")
-    print(f"Total de logs: {summary['total']}")
+    print("\n=== RESUMO DA ANALISE ===")
+    print(f"Total de logs processados: {summary['total']}")
     print(f"Total de ERROR: {summary['errors']}")
     print(f"Total de WARN: {summary['warnings']}")
     print("Frequencia por hora:")
@@ -61,7 +61,7 @@ def main():
         print(f"  {hour} - {parts}")
 
     export_csv(summary, args.output)
-    print(f"\nRelatory exported to: {args.output}")
+    print(f"\nRelatorio exportado para: {args.output}")
 
 if __name__ == "__main__":
     main()
