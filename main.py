@@ -1,7 +1,7 @@
 import argparse
 from detector import detect_log_format
 from parser import parse_line
-from aggregator import aggregate, generate_summary
+from aggregator import aggregate, generate_summary, aggregate_by_hour_level_geo
 from exporter import export_csv
 from geo_enricher import enrich_entries
 
@@ -36,7 +36,7 @@ def main():
     parser = argparse.ArgumentParser(description="CLI de Análise de Logs")
     parser.add_argument("--file", required=True, help="Caminho do ficheiro de log")
     parser.add_argument("--level", choices=["ERROR", "WARN", "INFO", "DEBUG"],help="Filtrar por nivel de severidade")
-    parser.add_argument("--output", required=True, metavar="FICHEIRO", help="Caminho do ficheiro CSV de saida")
+    parser.add_argument("--output", metavar="FICHEIRO", help="Caminho do ficheiro CSV de saida")
     args = parser.parse_args()
 
     entries = []
@@ -55,7 +55,7 @@ def main():
     counts = aggregate(entries)
     summary = generate_summary(counts)
 
-    print("\n=== RESUMO DA ANALISE ===")
+    print("\nRESUMO DA ANALISE")
     print(f"Total de logs processados: {summary['total']}")
     print(f"Total de ERROR: {summary['errors']}")
     print(f"Total de WARN: {summary['warnings']}")
@@ -64,8 +64,9 @@ def main():
         parts = ", ".join(f"{k}: {v}" for k, v in levels.items())
         print(f"  {hour} - {parts}")
 
-    export_csv(entries, args.output)
-    print(f"\nRelatorio exportado para: {args.output}")
+    if args.output:
+        export_csv(aggregate_by_hour_level_geo(entries), args.output)
+        print(f"\nRelatorio exportado para: {args.output}")
 
 if __name__ == "__main__":
     main()

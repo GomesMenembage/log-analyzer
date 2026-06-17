@@ -23,6 +23,19 @@ def aggregate(entries):
     return counts
 
 
+def aggregate_by_hour_level_geo(entries):
+    rows = defaultdict(lambda: {"total": 0, "pais": "", "cidade": ""})
+    for entry in entries:
+        hour = extract_hour(entry["timestamp"])
+        if not hour:
+            continue
+        key = (hour, entry["level"], entry.get("pais"), entry.get("cidade"))
+        rows[key]["total"] += 1
+        rows[key]["pais"] = entry.get("pais", "")
+        rows[key]["cidade"] = entry.get("cidade", "")
+    return rows
+
+
 def generate_summary(counts):
     total = sum(sum(v.values()) for v in counts.values())
     errors = sum(v.get("ERROR", 0) for v in counts.values())
