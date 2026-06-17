@@ -1,7 +1,8 @@
 import argparse
 from detector import detect_log_format
 from parser import parse_line
-from aggregator import aggregate
+from aggregator import aggregate, generate_summary
+from exporter import export_csv
 
 def read_log_file(path):
 
@@ -34,6 +35,7 @@ def main():
     parser = argparse.ArgumentParser(description="CLI de Análise de Logs")
     parser.add_argument("--file", required=True, help="Caminho do ficheiro de log")
     parser.add_argument("--level", choices=["ERROR", "WARN", "INFO", "DEBUG"],help="Filtrar por nivel de severidade")
+    parser.add_argument("--output", required=True, metavar="FICHEIRO", help="Caminho do ficheiro CSV de saida")
     args = parser.parse_args()
 
     entries = []
@@ -47,9 +49,19 @@ def main():
         print(entry)
 
     counts = aggregate(entries)
-    print("\n--- Agregação por hora ---")
-    for hour in sorted(counts):
-        print(f"{hour} -> {dict(counts[hour])}")
+    summary = generate_summary(counts)
+
+    print("\nRESUMO DA ANALISE")
+    print(f"Total de logs: {summary['total']}")
+    print(f"Total de ERROR: {summary['errors']}")
+    print(f"Total de WARN: {summary['warnings']}")
+    print("Frequencia por hora:")
+    for hour, levels in summary["hours"].items():
+        parts = ", ".join(f"{k}: {v}" for k, v in levels.items())
+        print(f"  {hour} - {parts}")
+
+    export_csv(summary, args.output)
+    print(f"\nRelatory exported to: {args.output}")
 
 if __name__ == "__main__":
     main()
