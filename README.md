@@ -1,64 +1,98 @@
 # CLI de Análise de Logs
 
-Ferramenta de linha de comando para análise, filtragem e enriquecimento de ficheiros de log Apache e Nginx (access log e error log). Processa logs linha por linha, identifica níveis de severidade, agrupa eventos por hora, consulta uma API pública de geolocalização de IP e exporta um resumo estatístico em CSV.
+Ferramenta de linha de comando para análise, filtragem e enriquecimento de ficheiros de log Apache e Nginx (access log e error log). Processa logs linha por linha, identifica níveis de severidade, agrupa eventos por hora, consulta uma API pública de geolocalização de IP e exporta os dados enriquecidos em CSV.
 
 ## Funcionalidades
 
 - Leitura de logs nos formatos Apache e Nginx (access log e error log)
 - Filtragem por nível de severidade (`ERROR`, `WARN`, `INFO`, `DEBUG`)
 - Extração e agrupamento de eventos por hora
-- Deteção de endereços IP e enriquecimento com dados de geolocalização (país, cidade, ISP, região)
+- Deteção de endereços IP e enriquecimento com dados de geolocalização (país, cidade)
 - Geração de resumo estatístico (total de logs, erros, warnings, frequência por hora)
-- Exportação do relatório em formato CSV
+- Exportação dos dados enriquecidos em CSV
 - Exibição de resumo no terminal
-- Tratamento de erros (ficheiro não encontrado, API indisponível, formato inválido)
-- Processamento de grandes volumes de logs
 
 ## Requisitos
 
 - Python 3.8+
 - Conexão com internet (para consulta à API de geolocalização)
 
-## Instalação
-
-```bash
-git clone https://github.com/user/log-analyzer.git
-cd log-analyzer
-pip install -r requirements.txt  # se aplicável
-```
-
 ## Uso
 
+### Análise básica (apenas terminal)
+
 ```bash
-python main.py --file logs.txt --level ERROR --output resultado.csv
+python main.py --file logs/apache_access_1.log
+```
+
+### Análise com exportação CSV
+
+```bash
+python main.py --file logs/apache_access_1.log --output reports/resultado.csv
+```
+
+### Filtrar por nível de severidade
+
+```bash
+# Apenas erros
+python main.py --file logs/apache_access_1.log --level ERROR
+
+# Apenas warnings
+python main.py --file logs/apache_access_1.log --level WARN
+
+# Apenas info
+python main.py --file logs/apache_access_1.log --level INFO
+
+# Com filtro e exportação
+python main.py --file logs/apache_access_1.log --level ERROR --output reports/erros.csv
+```
+
+### Analisar diferentes formatos de log
+
+```bash
+# Apache access log
+python main.py --file logs/apache_access_1.log --output reports/apache.csv
+
+# Apache error log
+python main.py --file logs/apache_error_1.log --output reports/apache_erros.csv
+
+# Nginx access log
+python main.py --file logs/nginx_access_1.log --output reports/nginx.csv
+
+# Nginx error log
+python main.py --file logs/nginx_error_1.log --output reports/nginx_erros.csv
 ```
 
 ### Argumentos
 
 | Argumento | Descrição |
 |-----------|-----------|
-| `--file` | Caminho do ficheiro de log a analisar (obrigatório) |
-| `--level` | Filtrar por nível de severidade (`ERROR`, `WARN`, `INFO`, `DEBUG`) |
-| `--output` | Nome do ficheiro CSV de saída (opcional) |
+| `--file` | Caminho do ficheiro de log (obrigatório) |
+| `--level` | Filtrar por nível (`ERROR`, `WARN`, `INFO`, `DEBUG`) |
+| `--output` | Caminho do ficheiro CSV de saída (opcional) |
 
-### Exemplo de saída (terminal)
+### Exemplo de saída no terminal
 
 ```
-=== RESUMO DA ANÁLISE ===
-Total de logs processados: 1500
-Total de ERROR: 45
-Total de WARN: 120
-Frequência por hora:
-  10:00 - 15 ocorrências
-  11:00 - 8 ocorrências
+=== RESUMO DA ANALISE ===
+Total de logs processados: 20
+Total de ERROR: 3
+Total de WARN: 4
+Frequencia por hora:
+  10:00 - INFO: 8, WARN: 3, ERROR: 1
+  11:00 - INFO: 5, ERROR: 2, WARN: 1
 ```
 
 ### Exemplo de CSV gerado
 
 ```csv
 hora,tipo,total,pais,cidade
-10:00,ERROR,5,Angola,Luanda
-10:00,WARN,3,Brasil,São Paulo
+10:00,INFO,8,Desconhecido,Desconhecido
+10:00,WARN,3,Desconhecido,Desconhecido
+10:00,ERROR,1,Desconhecido,Desconhecido
+11:00,INFO,5,Desconhecido,Desconhecido
+11:00,ERROR,2,Desconhecido,Desconhecido
+11:00,WARN,1,Desconhecido,Desconhecido
 ```
 
 ## Estrutura do projeto
@@ -66,37 +100,13 @@ hora,tipo,total,pais,cidade
 ```
 log-analyzer/
 ├── main.py              # Ponto de entrada com argparse
-├── log_parser.py        # Parsing de logs Apache e Nginx
-├── geo_enricher.py      # Consulta à API de geolocalização
+├── detector.py          # Deteção do formato do log
+├── parser.py           # Parsing de logs Apache e Nginx
 ├── aggregator.py        # Agregação e estatísticas
+├── geo_enricher.py      # Consulta à API de geolocalização
 ├── exporter.py          # Exportação CSV
-├── requirements.txt     # Dependências
 └── README.md
 ```
-
-## Requisitos Funcionais (RF)
-
-| ID | Descrição |
-|----|-----------|
-| RF01 | Ler ficheiros de log nos formatos Apache e Nginx |
-| RF02 | Validar existência do ficheiro antes do processamento |
-| RF03 | Analisar cada linha do ficheiro para extrair informações |
-| RF04 | Reconhecer níveis de severidade (ERROR, WARN, INFO, DEBUG) |
-| RF05 | Filtrar logs por nível via linha de comando |
-| RF06 | Extrair timestamp de cada entrada do log |
-| RF07 | Agrupar eventos de log por hora |
-| RF08 | Contar ocorrências por nível de log |
-| RF09 | Detetar endereços IP nas entradas do log |
-| RF10 | Consultar API pública de geolocalização de IP |
-| RF12 | Gerar resumo estatístico (totais e frequência por hora) |
-| RF13 | Exportar relatório em formato CSV |
-| RF14 | Aceitar parâmetros via CLI com argparse |
-| RF15 | Permitir escolha do nome/local do ficheiro CSV |
-| RF16 | Exibir resumo da análise no terminal |
-| RF17 | Tratar erros (ficheiro, API, formato inválido) |
-| RF18 | Manter histórico com Git |
-| RF19 | Processar grandes volumes sem falhar |
-| RF20 | Finalizar corretamente após gerar o relatório |
 
 ## Licença
 
